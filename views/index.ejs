@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css">
     <title>Members-only</title>
-</head>
-<body>
-    
-    <% if (user) {%>
-    <h1>WELCOME BACK <%= user.username %></h1>
-    <a href="/log-out">LOG OUT</a>
-  <% } else { %>
-    <a href="/sign-up">Sign up</a>
-    <a href="/login">Login</a>
-  <%}%>
-</body>
+  </head>
+  <body>
+    <div class="index main">
+      <div class="index heading">
+        <h1>Members-only</h1>
+        <nav>
+          <ul>
+            <% if (user) {%>
+            <a href="/new-message">Create new message</a>
+            <a href="/log-out">LOG OUT</a>
+            <% } else { %>
+            <li><a href="/sign-up">Sign up</a></li>
+            <li><a href="/login">Login</a></li>
+            <%}%>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </body>
 </html>

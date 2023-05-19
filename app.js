@@ -130,7 +130,9 @@ app.post('/login',[
         failureRedirect: '/',
     })
 ]);
-
+app.get("/new-message",(req,res)=>{
+    res.render('create-message');
+})
 passport.use(
     new LocalStrategy(async(username, password, done)=>{
         try{
