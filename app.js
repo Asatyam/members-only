@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const User = require('./models/user');
 const Message = require('./models/message');
+const {body,validationResult} = require("express-validator");
 
 const mongoDb = `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0.zomngs9.mongodb.net/members_only?retryWrites=true&w=majority`;
 mongoose.set('strictQuery', false);
@@ -32,7 +33,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
-
+app.use(function (req,res,next){
+    res.locals.currentUser = req.user;
+    next();
+})
 
 app.get('/',(req,res)=>{
     res.send("Hello World");
@@ -41,24 +45,67 @@ app.get('/',(req,res)=>{
 app.get('/sign-up',(req,res)=>{
     res.render('sign-up');
 })
-app.post("/sign-up",async(req,res,next)=>{
-    bcryptjs.hash(req.body.password,10,async(err,hashedPassword)=>{
-        if(err){
-            res.send(err);
-        }
-        try{
-            const user = new User({
-                username: req.body.username,
-                password: hashedPassword,
-            });
-            const result = await user.save();
-            res.redirect('/');
-        }catch(err){
-            return next(err);
-        }
-        
+app.post('/sign-up', [
+  body('username')
+    .trim()
+    .custom(async (value) => {
+      const user = await User.findOne({ username: value });
+      if (user) {
+        return await Promise.reject('Username already taken');
+      }
+      return true;
     })
-})
+    .escape(),
+  body('password')
+    .trim()
+    .isStrongPassword({
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+    })
+    .withMessage(
+      'Password must be of 8 characters with 1 lowercase, 1 uppercase, 1 number and 1 special symbols'
+    )
+    .escape(),
+    body('confirm')
+    .trim()
+    .custom(async value =>{
+        const password = body.password;
+        if(password !== value)
+        {
+            throw new Error("Passwords do not match");
+        }
+    })
+    .escape()
+    ,
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        
+      res.render('sign-up', { errors: errors.array() });
+      
+      return;
+    }
+
+    bcryptjs.hash(req.body.password, 10, async (err, hashedPassword) => {
+      if (err) {
+        res.send(err);
+      }
+      try {
+        const user = new User({
+          username: req.body.username,
+          password: hashedPassword,
+        });
+        const result = await user.save();
+        res.redirect('/');
+      } catch (err) {
+        return next(err);
+      }
+    });
+  },
+]);
 
 
 
