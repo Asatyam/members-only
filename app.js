@@ -39,7 +39,7 @@ app.use(function (req,res,next){
 })
 
 app.get('/',(req,res)=>{
-    res.send("Hello World");
+    res.render('index',{user:req.user});
 });
 
 app.get('/sign-up',(req,res)=>{
@@ -71,19 +71,20 @@ app.post('/sign-up', [
     .escape(),
     body('confirm')
     .trim()
-    .custom(async value =>{
-        const password = body.password;
+    .custom(async (value,{req}) =>{
+        const password = req.body.password;
         if(password !== value)
         {
             throw new Error("Passwords do not match");
         }
+        return true;
     })
     .escape()
     ,
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        
+
       res.render('sign-up', { errors: errors.array() });
       
       return;
@@ -98,7 +99,7 @@ app.post('/sign-up', [
           username: req.body.username,
           password: hashedPassword,
         });
-        const result = await user.save();
+         await user.save();
         res.redirect('/');
       } catch (err) {
         return next(err);
@@ -107,11 +108,61 @@ app.post('/sign-up', [
   },
 ]);
 
+app.get('/login',(req,res)=>{
+    res.render("login");
+})
 
+app.post('/login',[
+    body('username')
+    .trim()
+    .notEmpty()
+    .withMessage("Username cannot be empty")
+    .escape(),
 
+    body('password')
+    .trim()
+    .notEmpty()
+    .withMessage("Please enter the password")
+    .escape(),
 
+    passport.authenticate('local',{
+        successRedirect: '/',
+        failureRedirect: '/',
+    })
+]);
 
-
+passport.use(
+    new LocalStrategy(async(username, password, done)=>{
+        try{
+            const user = await User.findOne({username:username});
+            if(!user){
+                return done(null, false, {message: "User not found"});
+            };
+            bcryptjs.compare(password, user.password,(err,res)=>{
+                if (res){
+                    return done(null, user)
+                } else{
+                    return done(null, false, {message: "Incorrect password"});
+                }
+            });
+        }
+        catch(err){
+            return done(err);
+        }
+    }
+    )
+)
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+passport.deserializeUser(async function (id, done) {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+});
 
 
 app.listen(3000,()=>{console.log("App is listening on port 3000")});
