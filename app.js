@@ -38,8 +38,9 @@ app.use(function (req,res,next){
     next();
 })
 
-app.get('/',(req,res)=>{
-    res.render('index',{user:req.user});
+app.get('/',async(req,res)=>{
+    const messages = await Message.find().populate('author').exec();
+    res.render('index',{user:req.user,messages:messages});
 });
 
 app.get('/sign-up',(req,res)=>{
@@ -132,7 +133,35 @@ app.post('/login',[
 ]);
 app.get("/new-message",(req,res)=>{
     res.render('create-message');
-})
+});
+
+app.post('/new-message', [
+  body('title', 'Title cannot be empty').trim().notEmpty().escape(),
+
+  body('text', 'Message cannot be empty').trim().notEmpty().escape(),
+
+  async (req,res)=>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.render('create-message', { errors: errors.array() });
+      return;
+    }
+    const message = new Message({
+        title: req.body.title,
+        content: req.body.text,
+        date: new Date(),
+        author: req.user
+    });
+    await message.save();
+
+    res.redirect('/');
+    
+  }
+]);
+
+
+
+
 passport.use(
     new LocalStrategy(async(username, password, done)=>{
         try{
