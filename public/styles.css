@@ -1,9 +1,12 @@
+  
+
   *,
   *:before,
   *::after {
       margin: 0;
       padding: 0;
       font-family: 'Roboto Mono', monospace;
+      text-decoration: none;
   }
 
   .main.signup,.main.login,.main.message {
@@ -80,7 +83,9 @@
 
   .index.heading{
     display: flex;
-    background-color: aqua;
+    background-color: #f1f5f9;
+    
+    box-shadow: 8px 0px 10px 8px #475569;
     padding:20px 150px;
     justify-content: space-between;
     align-items: center;
@@ -92,3 +97,35 @@
   .index.heading li{
     list-style: none;
   }
+  .index.container{
+    padding:30px;
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+
+  }
+  .message-card{
+    color: white;
+    padding:20px;
+    background-color: #0c4a6e;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  
+  .message-card p:nth-child(1){
+    font-size: 1.6rem;
+    font-family: 'Staatliches', sans-serif;
+  }
+  .message-card p:nth-child(2){
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+    padding:10px 0px;
+    font-size:1.4rem;
+    margin:5px 2px;
+  }
+  /* .message-card p:last-child{
+        border-top: 2px solid white;
+        border-bottom: 2px solid white;
+  } */

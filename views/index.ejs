@@ -5,17 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Monoton&family=Roboto&display=swap" rel="stylesheet">
     <title>Members-only</title>
   </head>
+  <style>
+     a{font-family: 'Roboto', sans-serif;}
+  </style>
   <body>
     <div class="index main">
-      <div class="index heading">
-        <h1>Members-only</h1>
+      <div class="index heading" >
+        <h1 style = "font-family: 'Monoton', cursive;">Members-only</h1>
         <nav>
           <ul>
             <% if (user) {%>
             <a href="/new-message">Create new message</a>
-            <a href="/log-out">LOG OUT</a>
+            <a href="/log-out">Log Out</a>
             <% } else { %>
             <li><a href="/sign-up">Sign up</a></li>
             <li><a href="/login">Login</a></li>
@@ -29,10 +37,15 @@
         <div class="message-card">
             <p><%= message.title%></p>
             <p><%= message.content%></p>
-            <p><%= message.date%></p>
-            <p><%= message.author.username%></p>
+             <% if (user) {%>
+                <p>Author: <%= message.author.username %></p>
+                 <p><%= message.date.toLocaleString() %></p>
+                
+            <% } else { %>
+                <p>Author: Login and find out :) </p>
+                <p>Date: <a href="https://www.google.com/search?q=did+i+stutter+meme&tbm=isch&ved=2ahUKEwjdjrm2qYH_AhXNyHMBHbTzAMsQ2-cCegQIABAA&oq=did+i+stutter+meme&gs_lcp=CgNpbWcQAzIHCAAQigUQQzIHCAAQigUQQzIFCAAQgAQyBQgAEIAEMgUIABCABDIFCAAQgAQyBggAEAUQHjIGCAAQBRAeMgYIABAFEB4yBggAEAUQHjoECCMQJ1DPAliFB2CuCGgAcAB4AIAB_gGIAZEJkgEDMi01mAEAoAEBqgELZ3dzLXdpei1pbWfAAQE&sclient=img&ei=jWNnZJ2UIM2Rz7sPtOeD2Aw&bih=825&biw=1440#imgrc=mItiU0ILdCvN-M" style="color:lightblue">Did I stutter?</a></p>
+            <%}%>
         </div>
-            
         <% }); %> 
         <% } %>
     </div>

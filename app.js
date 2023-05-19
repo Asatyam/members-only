@@ -101,7 +101,12 @@ app.post('/sign-up', [
           password: hashedPassword,
         });
          await user.save();
-        res.redirect('/');
+         req.login(user, function (err) {
+           if (err) {
+             console.log(err);
+           }
+           return res.redirect('/');
+         });
       } catch (err) {
         return next(err);
       }
@@ -138,7 +143,7 @@ app.get("/new-message",(req,res)=>{
 app.post('/new-message', [
   body('title', 'Title cannot be empty').trim().notEmpty().escape(),
 
-  body('text', 'Message cannot be empty').trim().notEmpty().escape(),
+  body('text', 'Message cannot be empty').trim().notEmpty(),
 
   async (req,res)=>{
     const errors = validationResult(req);
@@ -146,19 +151,30 @@ app.post('/new-message', [
       res.render('create-message', { errors: errors.array() });
       return;
     }
-    const message = new Message({
-        title: req.body.title,
-        content: req.body.text,
-        date: new Date(),
-        author: req.user
-    });
-    await message.save();
+    if(req.user)
+    {
+         const message = new Message({
+           title: req.body.title,
+           content: req.body.text,
+           date: new Date(),
+           author: req.user,
+         });
+         await message.save();
 
+    }
     res.redirect('/');
     
   }
 ]);
 
+app.get('/log-out', (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect('/');
+  });
+});
 
 
 
